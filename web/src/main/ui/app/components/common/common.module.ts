@@ -18,7 +18,6 @@ import {TooltipModule} from "ngx-bootstrap";
   ],
   exports: [
     ConfirmationDialogComponent,
-    ,
     InfoLabelComponent,
     SpinnerComponent,
     HttpErrorComponent
