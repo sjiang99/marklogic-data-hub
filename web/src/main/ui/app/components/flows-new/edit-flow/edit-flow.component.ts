@@ -196,9 +196,25 @@ export class EditFlowComponent implements OnInit, OnDestroy {
   createStep(stepObject) {
     this.setStepDefaults(stepObject.step);
     this.disableSelect = true;
-    this.manageFlowsService.createStep(this.flow.id, stepObject.index, stepObject.step).subscribe(resp => {
+
+    if(!stepObject.isCopy){
+      this.manageFlowsService.createStep(this.flow.id, stepObject.index, stepObject.step).subscribe(resp => {
+        const newStep = Step.fromJSON(resp, this.projectDirectory, this.databases);
+        const index = stepObject.index - 1;
+        this.stepsArray.splice(index, 0, newStep);
+        console.log('stepsArray', this.stepsArray);
+        this.manageFlowsService.getFlowById(this.flowId).subscribe( resp => {
+          this.flow = Flow.fromJSON(resp);
+          this.disableSelect = false;
+        });
+        if (stepObject.step.stepDefinitionType === this.stepType.MAPPING) {
+          this.createMapping(resp);
+        }
+      });
+    }else{
+    this.manageFlowsService.createStep(this.flow.id, this.stepsArray.length - 1, stepObject).subscribe(resp => {
       const newStep = Step.fromJSON(resp, this.projectDirectory, this.databases);
-      const index = stepObject.index - 1;
+      const index = this.stepsArray.length;
       this.stepsArray.splice(index, 0, newStep);
       console.log('stepsArray', this.stepsArray);
       this.manageFlowsService.getFlowById(this.flowId).subscribe( resp => {
@@ -209,6 +225,7 @@ export class EditFlowComponent implements OnInit, OnDestroy {
         this.createMapping(resp);
       }
     });
+    }
   }
   stepSelected(index) {
     this.selectedStepId = this.stepsArray[index].id;

@@ -161,9 +161,20 @@ header {
     .grey-icon {
       color: rgba(169,169,169,.5);
     }
+    .copy-icon {
+      cursor: pointer;
+      font-size: 15px;
+      color: black;
+      margin: 3px;
+    }
+    .copy-icon:hover {
+      color: orange;
+    }
     .delete-icon {
       cursor: pointer;
-      color: rgba(169,169,169,.5);
+      color: black;
+      font-size: 17px;
+      margin: 3px;
     }
     .delete-icon:hover {
       color: #f5403d;

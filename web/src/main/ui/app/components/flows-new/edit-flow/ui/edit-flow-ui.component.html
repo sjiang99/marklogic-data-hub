@@ -13,11 +13,18 @@
     (newStep)="openStepDialog($event)"
     (runFlow)="openRunDialog(flow)"
     (stopFlow)="openStopDialog($event)"
+    (copyStep)="copyStepDialog($event)"
     (deleteStep)="deleteStepDialog($event)"
     (editFlow)="openFlowSettingsDialog()"
     (stepSelected)="stepSelected.emit($event)"
     (deleteFlow)="deleteFlowDialog()"
-    (updateFlow)="updateFlow()">
+    (updateFlow)="updateFlow()"
+    [step]="step"
+    [(selectedStepId)]="selectedStepId"
+    [flow]="flow"
+    [databases]="databases" 
+    [collections]="collections" 
+    [entities]="entities">
     <cdk-step *ngFor="let step of stepsArray; let i = index" label="{{stepsArray[i].name}}">
       <app-step 
         [step]="step"

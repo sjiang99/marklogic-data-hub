@@ -23,12 +23,14 @@ export class NewStepDialogUiComponent implements OnInit {
   @Input() step: any;
   @Input() flow: Flow;
   @Input() projectDirectory: string;
+  @Input() isCopy: boolean;
   @Input() isUpdate: boolean;
   @Output() getCollections = new EventEmitter();
   @Output() cancelClicked = new EventEmitter();
   @Output() saveClicked = new EventEmitter();
 
   public newStep: Step;
+  public copiedStep: Step;
   readonly stepOptions = Object.keys(StepType);
   readonly outputFormats = [
     {
@@ -90,7 +92,7 @@ export class NewStepDialogUiComponent implements OnInit {
       name: [this.step ? this.step.name : '', [
         Validators.required,
         Validators.pattern('[a-zA-Z][a-zA-Z0-9\_\-]*'),
-        ExistingStepNameValidator.forbiddenName(this.flow, this.step && this.step.name)
+        ExistingStepNameValidator.forbiddenName(this.flow, this.step && this.step.name, this.isCopy)
       ]],
       stepDefinitionType: [this.step ? this.step.stepDefinitionType : '', Validators.required],
       description: [(this.step && this.step.description) ? this.step.description : ''],
@@ -114,7 +116,9 @@ export class NewStepDialogUiComponent implements OnInit {
       const type = this.newStepForm.getRawValue().stepDefinitionType;
       this.setType(type);
       this.newStepForm.controls['stepDefinitionType'].disable();
-      this.newStepForm.controls['name'].disable();
+      if(!this.isCopy){
+        this.newStepForm.controls['name'].disable();
+      }
 
       // Removing Target entity when editing
 
@@ -206,13 +210,98 @@ export class NewStepDialogUiComponent implements OnInit {
   }
 
   onSave() {
-    if (this.isUpdate) {
-      this.newStep.name = this.newStepForm.getRawValue().name;
-      this.newStep.stepDefinitionType = this.newStepForm.getRawValue().stepDefinitionType;
-    } else {
-      this.newStep.name = this.newStepForm.value.name;
-      this.newStep.stepDefinitionType = this.newStepForm.value.stepDefinitionType;
+    if(this.isCopy)
+    {
+        const type = this.newStep.stepDefinitionType;
+        if (type === StepType.MAPPING) {
+          this.newStepForm.patchValue({
+            sourceDatabase: this.databaseObject.staging,
+            targetDatabase: this.databaseObject.final
+          });
+          this.tooltips = FlowsTooltips.mapping;
+          this.copiedStep = Step.createMappingStep();
+        }
+        if (type === StepType.MASTERING) {
+          this.newStepForm.patchValue({
+            sourceDatabase: this.databaseObject.final,
+            targetDatabase: this.databaseObject.final
+          });
+          this.tooltips = FlowsTooltips.mastering;
+          this.copiedStep = Step.createMasteringStep();
+        }
+        if (type === StepType.CUSTOM) {
+          this.newStepForm.patchValue({
+            sourceDatabase: this.databaseObject.staging,
+            targetDatabase: this.databaseObject.final
+          });
+          this.tooltips = FlowsTooltips.custom;
+          this.copiedStep = Step.createCustomStep();
+        }
+        if (type === StepType.INGESTION) {
+          this.newStepForm.patchValue({
+            sourceDatabase: '',
+            targetDatabase: this.databaseObject.staging
+          });
+          this.copiedStep = Step.createIngestionStep(this.projectDirectory);
+          this.tooltips = FlowsTooltips.ingest;
+        } else {
+          this.getCollections.emit(this.newStepForm.value.sourceDatabase);
+        }
+
+        if (this.copiedStep.stepDefinitionType === StepType.CUSTOM) {
+          this.copiedStep.stepDefinitionName = this.newStep.name;
+        } else {
+          this.copiedStep.stepDefinitionName = 'default-' + (this.newStepForm.value.stepDefinitionType || '').toLowerCase();
+        }
+        if (this.copiedStep.stepDefinitionType === StepType.INGESTION) {
+          this.copiedStep.options.permissions = this.newStep.options.permissions;
+          this.copiedStep.fileLocations = this.newStep.fileLocations;
+        }
+        if (this.copiedStep.stepDefinitionType === StepType.CUSTOM){
+          this.copiedStep.modulePath = this.newStep.modulePath;
+        }
+        this.copiedStep.description = this.newStepForm.value.description;
+        this.copiedStep.selectedSource = this.newStepForm.value.selectedSource;
+        if (this.copiedStep.selectedSource === 'query') {
+         // Accept empty source query for custom step
+        if (this.newStepForm.value.sourceQuery === '' && this.newStep.stepDefinitionType === StepType.CUSTOM) {
+          this.copiedStep.options.sourceQuery = 'cts.collectionQuery([])';
+        } else {
+          this.copiedStep.options.sourceQuery = this.newStepForm.value.sourceQuery;
+        }
+          this.copiedStep.options.sourceCollection = '';
+        } else if (this.copiedStep.selectedSource === 'collection') {
+          let ctsUri = `cts.collectionQuery([\"${this.newStepForm.value.sourceCollection}\"])`;
+          // Accept empty source collection for custom step
+        if (this.newStepForm.value.sourceCollection === '' && this.newStep.stepDefinitionType === StepType.CUSTOM) {
+          ctsUri = 'cts.collectionQuery([])';
+        }
+          this.copiedStep.options.sourceQuery = ctsUri;
+          this.copiedStep.options.sourceCollection = this.newStepForm.value.sourceCollection;
+        } else {
+           this.copiedStep.options.sourceQuery = 'cts.collectionQuery([])';
+           this.copiedStep.options.sourceCollection = '';
+        }        
+          this.copiedStep.name = this.newStepForm.getRawValue().name;
+          this.copiedStep.stepDefinitionType = this.newStepForm.getRawValue().stepDefinitionType;
+          this.copiedStep.description = this.newStepForm.value.description;
+          this.copiedStep.options.targetEntity = this.newStepForm.value.targetEntity;
+          this.copiedStep.options.sourceDatabase = this.newStepForm.value.sourceDatabase;
+          this.copiedStep.options.targetDatabase = this.newStepForm.value.targetDatabase;
+          this.copiedStep.options.outputFormat = this.newStepForm.value.outputFormat;
+        
+          this.copiedStep.options.additionalCollections = this.getValidTargetCollections();
+          this.setCollections();
+          this.saveClicked.emit(this.copiedStep);
+          return;
     }
+      if (this.isUpdate) {
+        this.newStep.name = this.newStepForm.getRawValue().name;
+        this.newStep.stepDefinitionType = this.newStepForm.getRawValue().stepDefinitionType;
+      } else {
+        this.newStep.name = this.newStepForm.value.name;
+        this.newStep.stepDefinitionType = this.newStepForm.value.stepDefinitionType;
+      }
 
     if (this.newStep.stepDefinitionType === StepType.CUSTOM) {
       this.newStep.stepDefinitionName = this.newStep.name;
@@ -242,6 +331,7 @@ export class NewStepDialogUiComponent implements OnInit {
       this.newStep.options.sourceQuery = 'cts.collectionQuery([])';
       this.newStep.options.sourceCollection = '';
     }
+  
     this.newStep.options.targetEntity = this.newStepForm.value.targetEntity;
     this.newStep.options.sourceDatabase = this.newStepForm.value.sourceDatabase;
     this.newStep.options.targetDatabase = this.newStepForm.value.targetDatabase;
@@ -252,6 +342,7 @@ export class NewStepDialogUiComponent implements OnInit {
     if (this.newStep.name !== '') {
       this.saveClicked.emit(this.newStep);
     }
+
   }
   capitalFirstLetter(str) {
     return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();

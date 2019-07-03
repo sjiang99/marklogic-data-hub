@@ -1,5 +1,8 @@
 import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, AfterContentChecked } from '@angular/core';
 import { CdkStepper } from '@angular/cdk/stepper';
+import {NewStepDialogComponent} from './new-step-dialog.component';
+import {MatDialog} from '@angular/material';
+
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import * as moment from 'moment';
 import { StepType } from '../../models/step.model';
@@ -21,10 +24,20 @@ export class StepperComponent extends CdkStepper implements OnChanges, AfterCont
   @Output() runFlow = new EventEmitter();
   @Output() stopFlow = new EventEmitter();
   @Output() stepSelected = new EventEmitter();
+  @Output() copyStep = new EventEmitter();
   @Output() deleteStep = new EventEmitter();
   @Output() editFlow = new EventEmitter();
   @Output() deleteFlow = new EventEmitter();
   @Output() updateFlow = new EventEmitter();
+  @Input() step: any;
+  @Input() databases: any;
+  @Input() collections: any;
+  @Input() entities: any;
+  @Input() projectDirectory: any;
+  @Input() selectedStepId: string;
+  @Input() flowEnded: string;
+  @Input() sourceQuery: string;
+  @Output() updateStep = new EventEmitter();
 
   public stepType: typeof StepType = StepType;
   showBody = true;
@@ -98,6 +111,20 @@ export class StepperComponent extends CdkStepper implements OnChanges, AfterCont
   }
   stopClicked(): void {
     this.stopFlow.emit(this.flow);
+  }
+  copyStepClicked(step): void {
+    let index = this.selectedIndex + 2;
+    const stepObj = {
+      step: step,
+      index: index,
+      databases: this.databases,
+      collections: this.collections,
+      entities: this.entities,
+      flow: this.flow,
+      isUpdate: true,
+      isCopy: true
+    }
+    this.copyStep.emit(stepObj);
   }
   deleteStepClicked(step): void {
     this.deleteStep.emit(step);

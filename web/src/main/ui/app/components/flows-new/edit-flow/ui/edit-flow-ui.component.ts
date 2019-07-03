@@ -1,22 +1,25 @@
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material';
 import { NewStepDialogComponent } from './new-step-dialog.component';
 import { RunFlowDialogComponent } from './run-flow-dialog.component';
 import { ConfirmationDialogComponent } from '../../../common';
+import { CopyDialogComponent } from '../../../common';
 import { FlowSettingsDialogComponent } from '../../manage-flows/ui/flow-settings-dialog.component';
 import { Flow } from '../../models/flow.model';
 import { Step } from '../../models/step.model';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { ManageFlowsService } from '../../services/manage-flows.service';
 
 @Component({
   selector: 'app-edit-flow-ui',
   templateUrl: './edit-flow-ui.component.html',
   styleUrls: ['./edit-flow-ui.component.scss'],
 })
-export class EditFlowUiComponent implements OnChanges {
+export class EditFlowUiComponent implements OnInit, OnChanges {
 
   @Input() flow: Flow;
+  @Input() step: any;
   @Input() flowNames: string[];
   @Input() stepsArray: any;
   @Input() databases: any;
@@ -41,8 +44,13 @@ export class EditFlowUiComponent implements OnChanges {
   constructor(
     public dialog: MatDialog,
     private snackBar: MatSnackBar,
-    private router: Router
-  ) {}
+    private router: Router,
+    private manageFlowsService: ManageFlowsService,
+  ) {
+  }
+  ngOnInit(){
+  }
+   
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes && changes.flowEnded) {
@@ -69,6 +77,7 @@ export class EditFlowUiComponent implements OnChanges {
           step: response,
           index: index
         };
+        console.log("response: ", response)
         this.stepCreate.emit(stepObject);
       }
     });
@@ -101,6 +110,32 @@ export class EditFlowUiComponent implements OnChanges {
         this.stopFlow.emit(flow.id);
       }
     });
+  }
+
+  copyStepDialog(obj): void{
+    //TODO: PROMPT FOR NAME CHANGE BEFORE
+    const dialogRef = this.dialog.open(NewStepDialogComponent, {
+      width: '600px',
+      data: {
+        title: 'Copy Step',
+        databases: obj.databases,
+        collections: obj.collections,
+        entities: obj.entities,
+        step: obj.step,
+        flow: obj.flow,
+        isUpdate: true,
+        isCopy: true,
+      }
+    });
+    dialogRef.afterClosed().subscribe(response => {
+        if(response){
+          response.index = obj.index;
+          response.step = obj.step;
+          response.isCopy = obj.isCopy;
+          //response.step.description = response.description;  
+          this.stepCreate.emit(response);
+        }
+      });
   }
 
   deleteStepDialog(step: Step): void {
