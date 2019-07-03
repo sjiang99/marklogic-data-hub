@@ -4,7 +4,6 @@ import { MatDialog } from '@angular/material';
 import { NewStepDialogComponent } from './new-step-dialog.component';
 import { RunFlowDialogComponent } from './run-flow-dialog.component';
 import { ConfirmationDialogComponent } from '../../../common';
-import { CopyDialogComponent } from '../../../common';
 import { FlowSettingsDialogComponent } from '../../manage-flows/ui/flow-settings-dialog.component';
 import { Flow } from '../../models/flow.model';
 import { Step } from '../../models/step.model';
