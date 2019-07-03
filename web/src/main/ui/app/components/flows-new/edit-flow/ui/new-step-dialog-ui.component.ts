@@ -220,6 +220,7 @@ export class NewStepDialogUiComponent implements OnInit {
           });
           this.tooltips = FlowsTooltips.mapping;
           this.copiedStep = Step.createMappingStep();
+          this.copiedStep.options = this.newStep.options;
         }
         if (type === StepType.MASTERING) {
           this.newStepForm.patchValue({
@@ -228,6 +229,7 @@ export class NewStepDialogUiComponent implements OnInit {
           });
           this.tooltips = FlowsTooltips.mastering;
           this.copiedStep = Step.createMasteringStep();
+          this.copiedStep.options = this.newStep.options;
         }
         if (type === StepType.CUSTOM) {
           this.newStepForm.patchValue({
@@ -243,6 +245,8 @@ export class NewStepDialogUiComponent implements OnInit {
             targetDatabase: this.databaseObject.staging
           });
           this.copiedStep = Step.createIngestionStep(this.projectDirectory);
+          this.copiedStep.options.permissions = this.newStep.options.permissions;
+          this.copiedStep.fileLocations = this.newStep.fileLocations;
           this.tooltips = FlowsTooltips.ingest;
         } else {
           this.getCollections.emit(this.newStepForm.value.sourceDatabase);
@@ -250,15 +254,9 @@ export class NewStepDialogUiComponent implements OnInit {
 
         if (this.copiedStep.stepDefinitionType === StepType.CUSTOM) {
           this.copiedStep.stepDefinitionName = this.newStep.name;
+          this.copiedStep.modulePath = this.newStep.modulePath;
         } else {
           this.copiedStep.stepDefinitionName = 'default-' + (this.newStepForm.value.stepDefinitionType || '').toLowerCase();
-        }
-        if (this.copiedStep.stepDefinitionType === StepType.INGESTION) {
-          this.copiedStep.options.permissions = this.newStep.options.permissions;
-          this.copiedStep.fileLocations = this.newStep.fileLocations;
-        }
-        if (this.copiedStep.stepDefinitionType === StepType.CUSTOM){
-          this.copiedStep.modulePath = this.newStep.modulePath;
         }
         this.copiedStep.description = this.newStepForm.value.description;
         this.copiedStep.selectedSource = this.newStepForm.value.selectedSource;
