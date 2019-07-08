@@ -11,8 +11,6 @@ export class ExistingStepNameValidator {
       }else{
          forbiddenName = flow.steps.find((step => (step.name === control.value && (currentStepName ? currentStepName !== step.name : true)) ));
       }
-      flow.steps.find((step) => console.log(step.name))
-      console.log("STEP: " + currentStepName);
       return forbiddenName ? {'forbiddenName': {value: control.value}} : null;
     }
   }

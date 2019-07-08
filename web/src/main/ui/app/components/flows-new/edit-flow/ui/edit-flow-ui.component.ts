@@ -112,7 +112,6 @@ export class EditFlowUiComponent implements OnInit, OnChanges {
   }
 
   copyStepDialog(obj): void{
-    //TODO: PROMPT FOR NAME CHANGE BEFORE
     const dialogRef = this.dialog.open(NewStepDialogComponent, {
       width: '600px',
       data: {
@@ -131,6 +130,7 @@ export class EditFlowUiComponent implements OnInit, OnChanges {
           response.index = obj.index;
           response.step = obj.step;
           response.isCopy = obj.isCopy;
+          response.options.outputFormat = obj.step.options.outputFormat;
           //response.step.description = response.description;  
           this.stepCreate.emit(response);
         }

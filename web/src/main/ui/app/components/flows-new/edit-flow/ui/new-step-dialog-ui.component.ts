@@ -251,97 +251,64 @@ export class NewStepDialogUiComponent implements OnInit {
         } else {
           this.getCollections.emit(this.newStepForm.value.sourceDatabase);
         }
-
-        if (this.copiedStep.stepDefinitionType === StepType.CUSTOM) {
-          this.copiedStep.stepDefinitionName = this.newStep.name;
-          this.copiedStep.modulePath = this.newStep.modulePath;
-        } else {
-          this.copiedStep.stepDefinitionName = 'default-' + (this.newStepForm.value.stepDefinitionType || '').toLowerCase();
-        }
-        this.copiedStep.description = this.newStepForm.value.description;
-        this.copiedStep.selectedSource = this.newStepForm.value.selectedSource;
-        if (this.copiedStep.selectedSource === 'query') {
-         // Accept empty source query for custom step
-        if (this.newStepForm.value.sourceQuery === '' && this.newStep.stepDefinitionType === StepType.CUSTOM) {
-          this.copiedStep.options.sourceQuery = 'cts.collectionQuery([])';
-        } else {
-          this.copiedStep.options.sourceQuery = this.newStepForm.value.sourceQuery;
-        }
-          this.copiedStep.options.sourceCollection = '';
-        } else if (this.copiedStep.selectedSource === 'collection') {
-          let ctsUri = `cts.collectionQuery([\"${this.newStepForm.value.sourceCollection}\"])`;
-          // Accept empty source collection for custom step
-        if (this.newStepForm.value.sourceCollection === '' && this.newStep.stepDefinitionType === StepType.CUSTOM) {
-          ctsUri = 'cts.collectionQuery([])';
-        }
-          this.copiedStep.options.sourceQuery = ctsUri;
-          this.copiedStep.options.sourceCollection = this.newStepForm.value.sourceCollection;
-        } else {
-           this.copiedStep.options.sourceQuery = 'cts.collectionQuery([])';
-           this.copiedStep.options.sourceCollection = '';
-        }        
-          this.copiedStep.name = this.newStepForm.getRawValue().name;
-          this.copiedStep.stepDefinitionType = this.newStepForm.getRawValue().stepDefinitionType;
-          this.copiedStep.description = this.newStepForm.value.description;
-          this.copiedStep.options.targetEntity = this.newStepForm.value.targetEntity;
-          this.copiedStep.options.sourceDatabase = this.newStepForm.value.sourceDatabase;
-          this.copiedStep.options.targetDatabase = this.newStepForm.value.targetDatabase;
-          this.copiedStep.options.outputFormat = this.newStepForm.value.outputFormat;
-        
-          this.copiedStep.options.additionalCollections = this.getValidTargetCollections();
-          this.setCollections();
-          this.saveClicked.emit(this.copiedStep);
-          return;
+        this.fillStep(this.copiedStep);
+        this.saveClicked.emit(this.copiedStep);
+        return;
     }
-      if (this.isUpdate) {
-        this.newStep.name = this.newStepForm.getRawValue().name;
-        this.newStep.stepDefinitionType = this.newStepForm.getRawValue().stepDefinitionType;
-      } else {
-        this.newStep.name = this.newStepForm.value.name;
-        this.newStep.stepDefinitionType = this.newStepForm.value.stepDefinitionType;
+      this.fillStep(this.newStep);
+      if (this.newStep.name !== '') {
+        this.saveClicked.emit(this.newStep);
       }
+  }  
 
-    if (this.newStep.stepDefinitionType === StepType.CUSTOM) {
-      this.newStep.stepDefinitionName = this.newStep.name;
+  fillStep(step: Step){
+    if (this.isUpdate || this.isCopy) {
+      step.name = this.newStepForm.getRawValue().name;
+      step.stepDefinitionType = this.newStepForm.getRawValue().stepDefinitionType;
     } else {
-      this.newStep.stepDefinitionName = 'default-' + (this.newStepForm.value.stepDefinitionType || '').toLowerCase();
+      step.name = this.newStepForm.value.name;
+      step.stepDefinitionType = this.newStepForm.value.stepDefinitionType;
+    }
+    if (step.stepDefinitionType === StepType.CUSTOM) {
+      step.stepDefinitionName = this.newStep.name;
+      step.modulePath = this.newStep.modulePath;
+    } else {
+      step.stepDefinitionName = 'default-' + (this.newStepForm.value.stepDefinitionType || '').toLowerCase();
     }
 
-    this.newStep.description = this.newStepForm.value.description;
-    this.newStep.selectedSource = this.newStepForm.value.selectedSource;
-    if (this.newStep.selectedSource === 'query') {
-      // Accept empty source query for custom step
-      if (this.newStepForm.value.sourceQuery === '' && this.newStep.stepDefinitionType === StepType.CUSTOM) {
-        this.newStep.options.sourceQuery = 'cts.collectionQuery([])';
-      } else {
-        this.newStep.options.sourceQuery = this.newStepForm.value.sourceQuery;
-      }
-      this.newStep.options.sourceCollection = '';
-    } else if (this.newStep.selectedSource === 'collection') {
+    step.description = this.newStepForm.value.description;
+    step.selectedSource = this.newStepForm.value.selectedSource;
+    if (step.selectedSource === 'query') {
+     // Accept empty source query for custom step
+    if (this.newStepForm.value.sourceQuery === '' && this.newStep.stepDefinitionType === StepType.CUSTOM) {
+      step.options.sourceQuery = 'cts.collectionQuery([])';
+    } else {
+      step.options.sourceQuery = this.newStepForm.value.sourceQuery;
+    }
+      step.options.sourceCollection = '';
+    } else if (step.selectedSource === 'collection') {
       let ctsUri = `cts.collectionQuery([\"${this.newStepForm.value.sourceCollection}\"])`;
       // Accept empty source collection for custom step
-      if (this.newStepForm.value.sourceCollection === '' && this.newStep.stepDefinitionType === StepType.CUSTOM) {
-        ctsUri = 'cts.collectionQuery([])';
-      }
-      this.newStep.options.sourceQuery = ctsUri;
-      this.newStep.options.sourceCollection = this.newStepForm.value.sourceCollection;
+    if (this.newStepForm.value.sourceCollection === '' && this.newStep.stepDefinitionType === StepType.CUSTOM) {
+      ctsUri = 'cts.collectionQuery([])';
+    }
+      step.options.sourceQuery = ctsUri;
+      step.options.sourceCollection = this.newStepForm.value.sourceCollection;
     } else {
-      this.newStep.options.sourceQuery = 'cts.collectionQuery([])';
-      this.newStep.options.sourceCollection = '';
+      step.options.sourceQuery = 'cts.collectionQuery([])';
+      step.options.sourceCollection = '';
     }
-  
-    this.newStep.options.targetEntity = this.newStepForm.value.targetEntity;
-    this.newStep.options.sourceDatabase = this.newStepForm.value.sourceDatabase;
-    this.newStep.options.targetDatabase = this.newStepForm.value.targetDatabase;
-    this.newStep.options.outputFormat = this.newStepForm.value.outputFormat;
 
-    this.newStep.options.additionalCollections = this.getValidTargetCollections();
+    step.options.targetEntity = this.newStepForm.value.targetEntity;
+    step.options.sourceDatabase = this.newStepForm.value.sourceDatabase;
+    step.options.targetDatabase = this.newStepForm.value.targetDatabase;
+    step.options.outputFormat = this.newStepForm.value.outputFormat;
+    
+    step.options.additionalCollections = this.getValidTargetCollections();
     this.setCollections();
-    if (this.newStep.name !== '') {
-      this.saveClicked.emit(this.newStep);
-    }
-
+    return;
   }
+
   capitalFirstLetter(str) {
     return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
   }

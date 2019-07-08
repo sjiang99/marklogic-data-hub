@@ -112,8 +112,10 @@ export class StepperComponent extends CdkStepper implements OnChanges, AfterCont
   stopClicked(): void {
     this.stopFlow.emit(this.flow);
   }
-  copyStepClicked(step): void {
+  copyStepClicked(idx: number): void {
+    this.selectedIndex = idx;
     let index = this.selectedIndex + 2;
+    let step = this.stepsArray[idx];
     const stepObj = {
       step: step,
       index: index,
