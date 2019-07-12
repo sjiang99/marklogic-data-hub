@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, OnIni
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material';
 import { NewStepDialogComponent } from './new-step-dialog.component';
+import { ImportStepDialogComponent } from './import-step-dialog.component';
 import { RunFlowDialogComponent } from './run-flow-dialog.component';
 import { ConfirmationDialogComponent } from '../../../common';
 import { FlowSettingsDialogComponent } from '../../manage-flows/ui/flow-settings-dialog.component';
@@ -60,6 +61,31 @@ export class EditFlowUiComponent implements OnInit, OnChanges {
 
   openStepDialog(index): void {
     const dialogRef = this.dialog.open(NewStepDialogComponent, {
+      width: '600px',
+      data: {
+        title: 'New Step',
+        databases: this.databases,
+        entities: this.entities,
+        step: null,
+        flow: this.flow,
+        projectDirectory: this.projectDirectory
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(response => {
+      if (response) {
+        const stepObject = {
+          step: response,
+          index: index
+        };
+        console.log("response: ", response)
+        this.stepCreate.emit(stepObject);
+      }
+    });
+  }
+  
+  importStepDialog(index): void {
+    const dialogRef = this.dialog.open(ImportStepDialogComponent, {
       width: '600px',
       data: {
         title: 'New Step',

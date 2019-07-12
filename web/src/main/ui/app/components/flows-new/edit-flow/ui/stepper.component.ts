@@ -21,6 +21,7 @@ export class StepperComponent extends CdkStepper implements OnChanges, AfterCont
   @Input() runFlowClicked: boolean;
   @Input() disableSelect: boolean;
   @Output() newStep = new EventEmitter();
+  @Output() importStep = new EventEmitter();
   @Output() runFlow = new EventEmitter();
   @Output() stopFlow = new EventEmitter();
   @Output() stepSelected = new EventEmitter();
@@ -105,6 +106,14 @@ export class StepperComponent extends CdkStepper implements OnChanges, AfterCont
     }
     console.log('index', index);
     this.newStep.emit(index);
+  }
+  importStepClicked(): void {
+    let index = this.selectedIndex + 2;
+    if (this.stepsArray.length === 0) {
+      index = null;
+    }
+    console.log('index', index);
+    this.importStep.emit(index);
   }
   runClicked(): void {
     this.runFlow.emit();

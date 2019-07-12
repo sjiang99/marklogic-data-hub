@@ -44,6 +44,8 @@ import {CustomUiComponent} from './custom/ui/custom-ui.component';
 import {AppCommonModule} from "../../common";
 
 import {ClipboardDirective} from '../../../directives/clipboard/clipboard.directive';
+import { ImportStepDialogUiComponent } from './ui/import-step-dialog-ui.component';
+import { ImportStepDialogComponent } from './ui/import-step-dialog.component';
 
 @NgModule({
   declarations: [
@@ -75,7 +77,9 @@ import {ClipboardDirective} from '../../../directives/clipboard/clipboard.direct
     TruncateCharactersPipe,
     CustomComponent,
     CustomUiComponent,
-    ClipboardDirective
+    ClipboardDirective,
+    ImportStepDialogComponent,
+    ImportStepDialogUiComponent
   ],
   imports: [
     CommonModule,
@@ -100,6 +104,7 @@ import {ClipboardDirective} from '../../../directives/clipboard/clipboard.direct
   ],
   providers: [],
   entryComponents: [
+    ImportStepDialogComponent,
     NewStepDialogComponent,
     RunFlowDialogComponent,
     AddMatchOptionDialogComponent,

@@ -1,0 +1,29 @@
+<h1 mat-dialog-title>Import Step</h1>
+<div id="import-dialog" mat-dialog-content class="content" [formGroup]="importStepForm">
+  <div class="select-flow">
+    <!-- <label id="flow-label">Select A Flow</label> -->
+      <mat-form-field>
+        <mat-label>Flow Names</mat-label>
+        <mat-select formControlName="flowName" required (selectionChange)="flowSelectionChange()">
+          <mat-option *ngFor="let flow of flowsArray" [value]="flow">
+            {{flow.name}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+  </div> 
+  <div *ngIf="importStepForm.value.flowName">
+    <!-- <h5>Select a Step to Import</h5> -->
+    <mat-form-field>
+    <mat-label>Step Names</mat-label>
+    <mat-select formControlName="stepName" required (selectionChange)="stepSelectionChange()">
+      <mat-option *ngFor="let step of stepsArray" [value]="step">
+        {{step.name}}
+      </mat-option>
+    </mat-select>
+    </mat-form-field>
+  </div>
+</div>
+<div mat-dialog-actions class="bottom">
+    <button id="step-cancel-btn" mat-raised-button color="primary" (click)="onCancel()">CANCEL</button>
+    <button id="step-save-btn" [disabled]="!importStepForm.value.stepName" mat-raised-button color="primary" (click)="onSave()">SAVE</button>
+</div>

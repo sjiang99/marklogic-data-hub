@@ -150,7 +150,7 @@ import {FolderBrowserModule} from "./components/folder-browser/folder-browser.mo
     MapComponent,
     MapUiComponent,
     MappingsComponent,
-    SettingsUiComponent
+    SettingsUiComponent,
   ],
   entryComponents: [
     HasBugsDialogComponent,
