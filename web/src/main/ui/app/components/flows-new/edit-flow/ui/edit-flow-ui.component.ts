@@ -30,6 +30,7 @@ export class EditFlowUiComponent implements OnInit, OnChanges {
   @Input() runFlowClicked: boolean;
   @Input() disableSelect: boolean;
   @Input() errorResponse: any;
+  @Input() copyConns: any;
   @Output() runFlow = new EventEmitter();
   @Output() stopFlow = new EventEmitter();
   @Output() saveFlow = new EventEmitter();
@@ -47,9 +48,9 @@ export class EditFlowUiComponent implements OnInit, OnChanges {
     private manageFlowsService: ManageFlowsService,
   ) {
   }
+
   ngOnInit(){
   }
-   
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes && changes.flowEnded) {
@@ -131,6 +132,7 @@ export class EditFlowUiComponent implements OnInit, OnChanges {
           response.step = obj.step;
           response.isCopy = obj.isCopy;
           response.options.outputFormat = obj.step.options.outputFormat;
+
           //response.step.description = response.description;  
           this.stepCreate.emit(response);
         }

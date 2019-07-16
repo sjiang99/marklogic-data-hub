@@ -220,7 +220,6 @@ export class NewStepDialogUiComponent implements OnInit {
           });
           this.tooltips = FlowsTooltips.mapping;
           this.copiedStep = Step.createMappingStep();
-          this.copiedStep.options = this.newStep.options;
         }
         if (type === StepType.MASTERING) {
           this.newStepForm.patchValue({
@@ -229,7 +228,6 @@ export class NewStepDialogUiComponent implements OnInit {
           });
           this.tooltips = FlowsTooltips.mastering;
           this.copiedStep = Step.createMasteringStep();
-          this.copiedStep.options = this.newStep.options;
         }
         if (type === StepType.CUSTOM) {
           this.newStepForm.patchValue({
@@ -252,6 +250,8 @@ export class NewStepDialogUiComponent implements OnInit {
           this.getCollections.emit(this.newStepForm.value.sourceDatabase);
         }
         this.fillStep(this.copiedStep);
+        //GO BACK TO THISSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS
+        // this.saveClicked.emit({copiedStep: this.copiedStep, mapName: this.newStep.name});
         this.saveClicked.emit(this.copiedStep);
         return;
     }
@@ -280,12 +280,12 @@ export class NewStepDialogUiComponent implements OnInit {
     step.selectedSource = this.newStepForm.value.selectedSource;
     if (step.selectedSource === 'query') {
      // Accept empty source query for custom step
-    if (this.newStepForm.value.sourceQuery === '' && this.newStep.stepDefinitionType === StepType.CUSTOM) {
-      step.options.sourceQuery = 'cts.collectionQuery([])';
-    } else {
-      step.options.sourceQuery = this.newStepForm.value.sourceQuery;
-    }
-      step.options.sourceCollection = '';
+        if (this.newStepForm.value.sourceQuery === '' && this.newStep.stepDefinitionType === StepType.CUSTOM) {
+          step.options.sourceQuery = 'cts.collectionQuery([])';
+        } else {
+          step.options.sourceQuery = this.newStepForm.value.sourceQuery;
+        }
+        step.options.sourceCollection = '';
     } else if (step.selectedSource === 'collection') {
       let ctsUri = `cts.collectionQuery([\"${this.newStepForm.value.sourceCollection}\"])`;
       // Accept empty source collection for custom step

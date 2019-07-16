@@ -20,6 +20,7 @@ export class StepComponent implements OnChanges {
   @Input() selectedStepId: string;
   @Input() flowEnded: string;
   @Input() sourceQuery: string;
+  @Input() copyConns: any;
   @Output() updateStep = new EventEmitter();
 
   @ViewChild(IngestComponent) ingestionStep: IngestComponent;

@@ -43,6 +43,7 @@ export class EditFlowComponent implements OnInit, OnDestroy {
 
   @ViewChild(EditFlowUiComponent) editFlowUi: EditFlowUiComponent;
 
+  loadName: any
   flowId: string;
   flow: Flow;
   flowNames: string[];
@@ -65,6 +66,7 @@ export class EditFlowComponent implements OnInit, OnDestroy {
     status: '',
     statusText: ''
   };
+  copyConns: any;
   navigationPopState: any;
 
   @Output() clipboardSuccess = new EventEmitter();
@@ -194,7 +196,7 @@ export class EditFlowComponent implements OnInit, OnDestroy {
     });
   }
   createStep(stepObject) {
-    this.setStepDefaults(stepObject.step);
+    this.setStepDefaults(stepObject);
     this.disableSelect = true;
 
     if(!stepObject.isCopy){
@@ -207,8 +209,9 @@ export class EditFlowComponent implements OnInit, OnDestroy {
           this.flow = Flow.fromJSON(resp);
           this.disableSelect = false;
         });
+        const stepObjInfo = {name: stepObject.name, isCopy: false}
         if (stepObject.step.stepDefinitionType === this.stepType.MAPPING) {
-          this.createMapping(resp);
+          this.createMapping(resp, stepObjInfo);
         }
       });
     }else{
@@ -222,8 +225,9 @@ export class EditFlowComponent implements OnInit, OnDestroy {
         this.flow = Flow.fromJSON(resp);
         this.disableSelect = false;
       });
+      const stepObjInfo = {name: stepObject.step.name, isCopy: stepObject.isCopy}
       if (stepObject.step.stepDefinitionType === this.stepType.MAPPING) {
-        this.createMapping(resp);
+        this.createMapping(resp, stepObjInfo);
       }
     });
     }
@@ -248,35 +252,52 @@ export class EditFlowComponent implements OnInit, OnDestroy {
       this.getFlow();
     });
   }
-  createMapping(step) {
+  createMapping(step, stepInfo) {
     let entity = _.find(this.entities, (e: Entity) => {
-          return e.name === step.options.targetEntity;
-        }),
-        mapName = this.flow.name + '-' + step.name,
-        baseUri = (entity.info.baseUri) ? entity.info.baseUri : '',
-        targetEntityType = baseUri + entity.name + '-' +
-          entity.info.version + '/' + entity.name,
-        mapObj = {
-          language:         'zxx',
-          name:             mapName,
-          description:      '',
-          version:          '0',
-          targetEntityType: targetEntityType,
-          sourceContext:    '/',
-          sourceURI:        '',
-          properties:       {}
-        }
+      return e.name === step.options.targetEntity;
+    }),
+    mapName = this.flow.name + '-' + step.name,
+    baseUri = (entity.info.baseUri) ? entity.info.baseUri : '',
+    targetEntityType = baseUri + entity.name + '-' +
+      entity.info.version + '/' + entity.name,
+    mapObj = {
+      language:         'zxx',
+      name:             mapName,
+      description:      '',
+      version:          '0',
+      targetEntityType: targetEntityType,
+      sourceContext:    '//',
+      sourceURI:        '',
+      properties:       {}
+    }
+    if(stepInfo.isCopy){
+      this.loadName = this.flow.name + '-' + stepInfo.name;
+    }
+
     console.log('create mapping', mapObj);
     this.manageFlowsService.saveMap(mapName, JSON.stringify(mapObj)).subscribe(resp => {
-      this.manageFlowsService.getMap(mapName).subscribe(resp => {
-        step.options['mapping'] = {
-          name: resp['name'],
-          version: resp['version']
-        };
-        this.updateStep(step);
-      });
+      if(stepInfo.isCopy){
+        //get the map of the original step here instead of using the name of the copied step, which will throw bad request
+        this.manageFlowsService.getMap(this.loadName).subscribe(resp => {
+          step.options['mapping'] = {
+            name: resp['name'],
+            version: resp['version']
+          };
+          // this.copyConns = resp['properties'];     <------connections will appear here in the resp, commented out for now
+          // console.log('CONNS: ', this.copyConns);
+          this.updateStep(step);
+        });
+      }else{
+        this.manageFlowsService.getMap(mapName).subscribe(resp => {
+          step.options['mapping'] = {
+            name: resp['name'],
+            version: resp['version']
+          };
+          this.updateStep(step);
+        });
+      }
     });
-  }
+}
   setStepDefaults(step): void {
     const defaultCollections = [`${step.name}`];
     if (step.stepDefinitionType === StepType.MAPPING) {
