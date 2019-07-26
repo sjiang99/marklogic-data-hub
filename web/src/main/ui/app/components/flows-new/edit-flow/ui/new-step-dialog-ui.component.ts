@@ -250,8 +250,6 @@ export class NewStepDialogUiComponent implements OnInit {
           this.getCollections.emit(this.newStepForm.value.sourceDatabase);
         }
         this.fillStep(this.copiedStep);
-        //GO BACK TO THISSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS
-        // this.saveClicked.emit({copiedStep: this.copiedStep, mapName: this.newStep.name});
         this.saveClicked.emit(this.copiedStep);
         return;
     }
@@ -298,12 +296,13 @@ export class NewStepDialogUiComponent implements OnInit {
       step.options.sourceQuery = 'cts.collectionQuery([])';
       step.options.sourceCollection = '';
     }
-
+    // update options of created copy with the original options
+    const tempOptions = this.newStep.options;
+    step.options = tempOptions;
     step.options.targetEntity = this.newStepForm.value.targetEntity;
     step.options.sourceDatabase = this.newStepForm.value.sourceDatabase;
     step.options.targetDatabase = this.newStepForm.value.targetDatabase;
     step.options.outputFormat = this.newStepForm.value.outputFormat;
-    
     step.options.additionalCollections = this.getValidTargetCollections();
     this.setCollections();
     return;

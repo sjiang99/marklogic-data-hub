@@ -27,6 +27,7 @@ import * as _ from "lodash";
     [runFlowClicked]="runFlowClicked"
     [disableSelect]="disableSelect"
     [errorResponse]="errorResponse"
+    [copyConns]="copyConns"
     (saveFlow)="saveFlow($event)"
     (stopFlow)="stopFlow($event)"
     (runFlow)="runFlow($event)"
@@ -282,9 +283,8 @@ export class EditFlowComponent implements OnInit, OnDestroy {
           step.options['mapping'] = {
             name: resp['name'],
             version: resp['version']
-          };
-          // this.copyConns = resp['properties'];     <------connections will appear here in the resp, commented out for now
-          // console.log('CONNS: ', this.copyConns);
+          };  
+          this.copyConns = resp;     
           this.updateStep(step);
         });
       }else{

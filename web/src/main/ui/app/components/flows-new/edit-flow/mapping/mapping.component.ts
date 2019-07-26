@@ -1,4 +1,4 @@
-import { Component, Input, Output, OnInit, EventEmitter, ViewChild } from '@angular/core';
+import { Component, Input, Output, OnInit, EventEmitter, ViewChild, OnChanges } from '@angular/core';
 import { Entity } from '../../../../models';
 import { EntitiesService } from '../../../../models/entities.service';
 import { SearchService } from '../../../search/search.service';
@@ -20,10 +20,12 @@ import { Flow } from "../../models/flow.model";
       [mapping]="this.mapping"
       [targetEntity]="this.targetEntity"
       [conns]="this.conns"
+      [copyConns]="copyConns"
       [sampleDocSrcProps]="this.sampleDocSrcProps"
       [editURIVal]="this.editURIVal"
       (updateURI)="this.updateURI($event)"
       (updateMap)="this.updateMap($event)"
+      (updateCopy)="this.updateCopy($event)"
     ></app-mapping-ui>
   `
 })
@@ -32,6 +34,7 @@ export class MappingComponent implements OnInit {
 
   @Input() flow: Flow;
   @Input() step: Step;
+  @Input() copyConns: any;
   @Output() saveStep = new EventEmitter();
 
   // Entity Model
@@ -72,6 +75,17 @@ export class MappingComponent implements OnInit {
     this.conns = conns;
     this.saveMap();
   }
+
+  /**
+   * Update copied mapping with the original's details
+   */
+  updateCopy(details){
+    this.mapping.description = details.description;
+    this.mapping.version = details.version - 1;
+    this.mapping.sourceContext = details.sourceContext;
+    this.sampleDocURI = details.sourceURI;
+  }
+
 
   constructor(
     private searchService: SearchService,

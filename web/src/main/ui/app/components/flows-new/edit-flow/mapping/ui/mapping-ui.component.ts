@@ -16,11 +16,14 @@ export class MappingUiComponent implements OnChanges {
   @Input() mapping: Mapping = new Mapping();
   @Input() targetEntity: Entity = null;
   @Input() conns: object = {};
+  @Input() copyConns: any;
   @Input() sampleDocSrcProps: Array<any> = [];
   @Input() editURIVal: string = '';
 
+  @Output() setMap = new EventEmitter();
   @Output() updateURI = new EventEmitter();
   @Output() updateMap = new EventEmitter();
+  @Output() updateCopy = new EventEmitter();
 
   private uriOrig: string = '';
   private connsOrig: object = {};
@@ -32,6 +35,7 @@ export class MappingUiComponent implements OnChanges {
 
   public editingURI: boolean = false;
   public editingSourceContext: boolean = false;
+  public fillConns: any;
 
   /**
    * Update the sample document based on a URI.
@@ -124,6 +128,18 @@ export class MappingUiComponent implements OnChanges {
     if (changes.conns) {
       this.connsOrig = _.cloneDeep(changes.conns.currentValue);
     }
+
+    //Fill copied mapping step with connections and update  
+    if(changes.copyConns && changes.copyConns.currentValue && !changes.mapping){
+      this.trimConns(this.copyConns.properties);
+      this.conns = this.fillConns;
+
+      if(this.mapping.name != this.copyConns.name)
+      {
+        this.updateCopy.emit(this.copyConns);
+        this.updateMap.emit(this.conns);
+      }
+  }
   }
 
   /**
@@ -187,6 +203,17 @@ export class MappingUiComponent implements OnChanges {
    */
   mapChanged() {
     return !_.isEqual(this.conns, this.connsOrig);
+  }
+
+  /**
+   * Trim away "sourcedFrom" from the connections we retreived 
+   * in order for the pure mapping to reflect correctly in the front-end
+   */
+  trimConns(copyConns){
+    
+    for (let [key, value] of Object.entries(copyConns)){
+      this.fillConns = {...this.fillConns, [key]: value["sourcedFrom"]}
+    }   
   }
 
   /**
