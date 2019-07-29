@@ -130,15 +130,12 @@ export class MappingUiComponent implements OnChanges {
     }
 
     //Fill copied mapping step with connections and update  
-    if(changes.copyConns && changes.copyConns.currentValue && !changes.mapping){
+    if(changes.copyConns && changes.copyConns.currentValue && !changes.mapping && this.mapping.name == this.copyConns.mapName){
       this.trimConns(this.copyConns.properties);
       this.conns = this.fillConns;
 
-      if(this.mapping.name != this.copyConns.name)
-      {
-        this.updateCopy.emit(this.copyConns);
-        this.updateMap.emit(this.conns);
-      }
+      this.updateCopy.emit(this.copyConns);
+      this.updateMap.emit(this.conns);
   }
   }
 

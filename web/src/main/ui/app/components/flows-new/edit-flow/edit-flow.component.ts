@@ -284,7 +284,8 @@ export class EditFlowComponent implements OnInit, OnDestroy {
             name: resp['name'],
             version: resp['version']
           };  
-          this.copyConns = resp;     
+          this.copyConns = resp; 
+          this.copyConns.mapName = mapName;    
           this.updateStep(step);
         });
       }else{
