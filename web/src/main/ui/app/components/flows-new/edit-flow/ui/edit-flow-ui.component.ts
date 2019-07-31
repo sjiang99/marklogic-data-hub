@@ -40,7 +40,7 @@ export class EditFlowUiComponent implements OnInit, OnChanges {
   @Output() stepCreate = new EventEmitter();
   @Output() stepUpdate = new EventEmitter();
   @Output() stepDelete = new EventEmitter();
-
+  stepObject: any;
 
   constructor(
     public dialog: MatDialog,
@@ -99,14 +99,32 @@ export class EditFlowUiComponent implements OnInit, OnChanges {
 
     dialogRef.afterClosed().subscribe(response => {
       if (response) {
-        const stepObject = {
-          step: response,
-          index: index
-        };
         console.log("response: ", response)
-        this.stepCreate.emit(stepObject);
+        const idialogRef = this.dialog.open(NewStepDialogComponent, {
+          width: '600px',
+          data: {
+            title: 'Import Step',
+            databases: this.databases,
+            collections: this.collections,
+            entities: this.entities,
+            step: response,
+            flow: this.flow,
+            isUpdate: true,
+            isImport: true
+          }
+        });
+        idialogRef.afterClosed().subscribe(response => {
+          if (response) {
+            const stepObject = {
+              step: response,
+              index: index
+            };
+            this.stepCreate.emit(stepObject);
+          }
+        });
       }
     });
+    
   }
 
   openRunDialog(): void {

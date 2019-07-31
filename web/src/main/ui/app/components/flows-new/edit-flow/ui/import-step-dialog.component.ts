@@ -19,7 +19,8 @@ export interface DialogData {
   template: `
   <app-import-step-dialog-ui
     (cancelClicked)="cancelClicked()"
-    (saveClicked)="saveClicked($event)"
+    (nextClicked)="nextClicked($event)"
+    [flow]="data.flow"
   ></app-import-step-dialog-ui>
 `
 })
@@ -30,7 +31,7 @@ export class ImportStepDialogComponent {
     private manageFlowsService: ManageFlowsService,
     @Inject(MAT_DIALOG_DATA) public data: DialogData) {}
 
-  saveClicked(importedStep) {
+  nextClicked(importedStep) {
     this.dialogRef.close(importedStep);
   }
   cancelClicked(): void {

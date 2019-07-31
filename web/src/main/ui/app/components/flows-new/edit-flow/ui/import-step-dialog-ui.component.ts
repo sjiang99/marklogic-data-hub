@@ -1,9 +1,8 @@
-import { Component, Output, OnInit, EventEmitter } from '@angular/core';
+import { Component, Input, Output, OnInit, EventEmitter } from '@angular/core';
 import {Flow} from "../../models/flow.model";
 import {ManageFlowsService} from "../../services/manage-flows.service";
 import { FormGroup, FormControl } from '@angular/forms';
 import { Step } from '../../models/step.model';
-
 import _ = require('lodash');
 
 @Component({
@@ -14,11 +13,11 @@ import _ = require('lodash');
 
 export class ImportStepDialogUiComponent implements OnInit {
   @Output() cancelClicked = new EventEmitter();
-  @Output() saveClicked = new EventEmitter();
+  @Output() nextClicked = new EventEmitter();
+  @Input() flow: Flow;
   flowsArray = [];
   stepsArray = [];
   flowId: string;
-  flow: Flow;
   selectedFlow: Flow;
   selectedStep: Step;
   importStepForm = new FormGroup({
@@ -34,27 +33,36 @@ export class ImportStepDialogUiComponent implements OnInit {
 
   ngOnInit() {
     this.getFlows();
-    // this.importStepForm = this.formBuilder.group({
-    //   flowName: [],
-    //   stepName: []
-    // })
   }
   
   getFlows(){
     this.manageFlowsService.getFlows().subscribe(resp => {
-      _.remove(this.flowsArray, () => {
-        return true;
-      });
-      _.forEach(resp, flow => {
-        const flowObject = Flow.fromJSON(flow);
-        this.flowsArray.push(flowObject);
-      });
+      if(resp){
+        _.remove(this.flowsArray, () => {
+          return true;
+        });
+        _.forEach(resp, flow => {
+          const flowObject = Flow.fromJSON(flow);
+          this.flowsArray.push(flowObject);
+        });
+        //remove own flow from flowsArray
+        for(var i = 0; i < this.flowsArray.length; i++){
+          if(this.flowsArray[i].name === this.flow.name){
+            this.flowsArray.splice(i,1);
+          }
+        }
+      }
     });
   }
 
   flowSelectionChange(){
     this.selectedFlow = this.importStepForm.value.flowName;
-    this.stepsArray = this.selectedFlow.steps;
+    this.manageFlowsService.getSteps(this.selectedFlow.name).subscribe(resp => {
+      if(resp){
+        this.stepsArray = resp;
+        console.log("array:", this.stepsArray);
+      }
+    });
   }
 
   stepSelectionChange(){
@@ -65,8 +73,8 @@ export class ImportStepDialogUiComponent implements OnInit {
     this.cancelClicked.emit();
   }
 
-  onSave() {
-    this.saveClicked.emit(this.selectedStep);
+  onNext() {
+    this.nextClicked.emit(this.selectedStep);
   }
 
 }

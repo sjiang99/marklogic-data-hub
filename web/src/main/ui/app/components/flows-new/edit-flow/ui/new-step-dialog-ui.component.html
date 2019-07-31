@@ -31,7 +31,8 @@
         id="step-source-collection" 
         class="type-select" 
         [placeholder]="'Source Collection' + (sourceRequired ? '*' : '')" 
-        formControlName="sourceCollection">
+        formControlName="sourceCollection"
+        (selectionChange)="collectionSelected()">
           <mat-option class="type-option" *ngFor="let collection of collections" [value]="collection">{{collection}}</mat-option>
       </mat-select>
     </mat-form-field>
@@ -108,6 +109,6 @@
 </div>
 <div mat-dialog-actions class="bottom">
   <button id="step-cancel-btn" mat-raised-button color="primary" (click)="onNoClick()">CANCEL</button>
-  <button id="step-save-btn" [disabled]="!newStepForm.valid" mat-raised-button color="primary" (click)="onSave()">SAVE
+  <button id="step-save-btn" [disabled]="!newStepForm.valid || importBool" mat-raised-button color="primary" (click)="onSave()">SAVE
   </button>
 </div>

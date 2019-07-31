@@ -13,6 +13,7 @@ export interface DialogData {
   projectDirectory: string;
   isUpdate: boolean;
   isCopy: boolean;
+  isImport: boolean;
 }
 @Component({
   selector: 'app-new-step-dialog',
@@ -27,6 +28,7 @@ export interface DialogData {
     [projectDirectory]="data.projectDirectory"
     [isUpdate]="data.isUpdate"
     [isCopy]="data.isCopy"
+    [isImport]="data.isImport"
     (getCollections)="getCollections($event)"
     (cancelClicked)="cancelClicked()"
     (saveClicked)="saveClicked($event)"

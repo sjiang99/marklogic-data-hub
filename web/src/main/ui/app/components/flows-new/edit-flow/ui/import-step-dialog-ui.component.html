@@ -18,6 +18,7 @@
     <mat-select formControlName="stepName" required (selectionChange)="stepSelectionChange()">
       <mat-option *ngFor="let step of stepsArray" [value]="step">
         {{step.name}}
+        <span style="color:gray"> ({{step.stepDefinitionType}}) </span>
       </mat-option>
     </mat-select>
     </mat-form-field>
@@ -25,5 +26,5 @@
 </div>
 <div mat-dialog-actions class="bottom">
     <button id="step-cancel-btn" mat-raised-button color="primary" (click)="onCancel()">CANCEL</button>
-    <button id="step-save-btn" [disabled]="!importStepForm.value.stepName" mat-raised-button color="primary" (click)="onSave()">SAVE</button>
+    <button id="step-save-btn" [disabled]="!importStepForm.value.stepName" mat-raised-button color="primary" (click)="onNext()">NEXT</button>
 </div>
