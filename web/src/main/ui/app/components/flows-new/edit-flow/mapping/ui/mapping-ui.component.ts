@@ -133,7 +133,7 @@ export class MappingUiComponent implements OnChanges {
     if(changes.copyConns && changes.copyConns.currentValue && !changes.mapping && this.mapping.name == this.copyConns.mapName){
       this.trimConns(this.copyConns.properties);
       this.conns = this.fillConns;
-
+      console.log('MAPPING UI')
       this.updateCopy.emit(this.copyConns);
       this.updateMap.emit(this.conns);
   }

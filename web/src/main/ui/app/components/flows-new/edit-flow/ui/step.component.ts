@@ -61,28 +61,6 @@ export class StepComponent implements OnChanges {
     this.showBody = !this.showBody;
     this.masteringTabIndex = 0;
   }
-  editSettingsClicked() {
-    const dialogRef = this.dialog.open(NewStepDialogComponent, {
-      width: '600px',
-      data: {
-        title: 'Edit Step',
-        databases: this.databases,
-        collections: this.collections,
-        entities: this.entities,
-        step: this.step,
-        flow: this.flow,
-        isUpdate: true
-      }
-    });
-
-    dialogRef.afterClosed().subscribe(response => {
-      if (response) {
-        if (this.mappingStep)
-          this.mappingStep.stepEdited(response);
-        this.updateStep.emit(response);
-      }
-    });
-  }
 
   saveStep(stepToSave) {
     let step = this.step;

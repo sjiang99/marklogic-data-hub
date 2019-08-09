@@ -282,7 +282,7 @@ export class NewStepDialogUiComponent implements OnInit {
   }  
 
   fillStep(step: Step){
-    if (this.isUpdate || this.isCopy) {
+    if (this.isUpdate || this.isCopy || this.isImport) {
       step.name = this.newStepForm.getRawValue().name;
       step.stepDefinitionType = this.newStepForm.getRawValue().stepDefinitionType;
     } else {

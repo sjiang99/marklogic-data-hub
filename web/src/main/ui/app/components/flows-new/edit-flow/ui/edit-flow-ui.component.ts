@@ -92,7 +92,7 @@ export class EditFlowUiComponent implements OnInit, OnChanges {
     const dialogRef = this.dialog.open(ImportStepDialogComponent, {
       width: '600px',
       data: {
-        title: 'New Step',
+        title: 'Import Step',
         databases: this.databases,
         entities: this.entities,
         step: null,
@@ -103,7 +103,8 @@ export class EditFlowUiComponent implements OnInit, OnChanges {
 
     dialogRef.afterClosed().subscribe(response => {
       if (response) {
-        console.log("response: ", response)
+        const importedFlow = response.flowName;
+        const importedStep = response.stepName;
         const idialogRef = this.dialog.open(NewStepDialogComponent, {
           width: '600px',
           data: {
@@ -111,7 +112,7 @@ export class EditFlowUiComponent implements OnInit, OnChanges {
             databases: this.databases,
             collections: this.collections,
             entities: this.entities,
-            step: response,
+            step: response.step,
             flow: this.flow,
             isUpdate: true,
             isImport: true
@@ -121,6 +122,10 @@ export class EditFlowUiComponent implements OnInit, OnChanges {
           if (response) {
             const stepObject = {
               step: response,
+              importedStep: importedStep,
+              importedFlow: importedFlow,
+              isImport: true,
+              isCopy: false,
               index: index
             };
             this.stepCreate.emit(stepObject);
@@ -179,6 +184,7 @@ export class EditFlowUiComponent implements OnInit, OnChanges {
           response.index = obj.index;
           response.step = obj.step;
           response.isCopy = obj.isCopy;
+          response.isImport = false;
           response.options.outputFormat = obj.step.options.outputFormat;
 
           //response.step.description = response.description;  

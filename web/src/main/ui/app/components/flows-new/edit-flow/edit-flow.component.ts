@@ -200,23 +200,9 @@ export class EditFlowComponent implements OnInit, OnDestroy {
     this.setStepDefaults(stepObject);
     this.disableSelect = true;
 
-    if(!stepObject.isCopy){
-      this.manageFlowsService.createStep(this.flow.id, stepObject.index, stepObject.step).subscribe(resp => {
-        const newStep = Step.fromJSON(resp, this.projectDirectory, this.databases);
-        const index = stepObject.index - 1;
-        this.stepsArray.splice(index, 0, newStep);
-        console.log('stepsArray', this.stepsArray);
-        this.manageFlowsService.getFlowById(this.flowId).subscribe( resp => {
-          this.flow = Flow.fromJSON(resp);
-          this.disableSelect = false;
-        });
-        const stepObjInfo = {name: stepObject.name, isCopy: false}
-        if (stepObject.step.stepDefinitionType === this.stepType.MAPPING) {
-          this.createMapping(resp, stepObjInfo);
-        }
-      });
-    }else{
-    this.manageFlowsService.createStep(this.flow.id, stepObject.index, stepObject).subscribe(resp => {
+    const stepObj = stepObject.isCopy ? stepObject : stepObject.step;
+    console.log("STEP OBJECT:", stepObject);
+    this.manageFlowsService.createStep(this.flow.id, stepObject.index, stepObj).subscribe(resp => {
       const newStep = Step.fromJSON(resp, this.projectDirectory, this.databases);
       //const index = this.stepsArray.length;
       const index = stepObject.index - 1;
@@ -226,12 +212,11 @@ export class EditFlowComponent implements OnInit, OnDestroy {
         this.flow = Flow.fromJSON(resp);
         this.disableSelect = false;
       });
-      const stepObjInfo = {name: stepObject.step.name, isCopy: stepObject.isCopy}
+      const stepObjInfo = stepObject.isImport ? {name: stepObject.step.name, isCopy: stepObject.isCopy, isImport: stepObject.isImport, importedFlow: stepObject.importedFlow, importedStep: stepObject.importedStep} : {name: stepObject.step.name, isCopy: stepObject.isCopy, isImport: stepObject.isImport}
       if (stepObject.step.stepDefinitionType === this.stepType.MAPPING) {
         this.createMapping(resp, stepObjInfo);
       }
     });
-    }
   }
   stepSelected(index) {
     this.selectedStepId = this.stepsArray[index].id;
@@ -273,11 +258,13 @@ export class EditFlowComponent implements OnInit, OnDestroy {
     }
     if(stepInfo.isCopy){
       this.loadName = this.flow.name + '-' + stepInfo.name;
+    }else if(stepInfo.isImport){
+      this.loadName = stepInfo.importedFlow + '-' + stepInfo.name;
     }
 
     console.log('create mapping', mapObj);
     this.manageFlowsService.saveMap(mapName, JSON.stringify(mapObj)).subscribe(resp => {
-      if(stepInfo.isCopy){
+      if(stepInfo.isCopy || stepInfo.isImport){
         //get the map of the original step here instead of using the name of the copied step, which will throw bad request
         this.manageFlowsService.getMap(this.loadName).subscribe(resp => {
           step.options['mapping'] = {
@@ -285,7 +272,7 @@ export class EditFlowComponent implements OnInit, OnDestroy {
             version: resp['version']
           };  
           this.copyConns = resp; 
-          this.copyConns.mapName = mapName;    
+          this.copyConns.mapName = mapName;   
           this.updateStep(step);
         });
       }else{

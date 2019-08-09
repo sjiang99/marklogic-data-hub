@@ -5,7 +5,6 @@
         <h2 id="step-details-name" title={{step?.description}}>{{step.name}}</h2>
       </div>
       <div class="steps-header steps-header-buttons">
-        <mat-icon id="step-menu" class="flow-menu-icon" [matMenuTriggerFor]="flowSubMenu">more_vert</mat-icon>
         <mat-icon id="step-expand-collapse-btn" class="flow-menu-icon" (click)="this.toggleBody()">{{ this.showBody ? 'expand_less' : 'expand_more' }}</mat-icon>
       </div>
     </header>
@@ -51,6 +50,3 @@
       </div>
     </div>
 </div>
-<mat-menu id="step-menu-dialog" #flowSubMenu="matMenu">
-    <div id="step-menu-edit-btn" mat-menu-item (click)="this.editSettingsClicked()">Edit Settings</div>
-</mat-menu>

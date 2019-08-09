@@ -81,7 +81,7 @@ export class MappingComponent implements OnInit {
    */
   updateCopy(details){
     this.mapping.description = details.description;
-    this.mapping.version = details.version - 1;
+    this.mapping.version = details.version - 2;
     this.mapping.sourceContext = details.sourceContext;
     this.sampleDocURI = details.sourceURI;
   }

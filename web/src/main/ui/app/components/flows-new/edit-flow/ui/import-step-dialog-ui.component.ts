@@ -67,6 +67,7 @@ export class ImportStepDialogUiComponent implements OnInit {
 
   stepSelectionChange(){
     this.selectedStep = this.importStepForm.value.stepName;
+    console.log('step:', this.selectedStep)
   }
 
   onCancel(): void {
@@ -74,7 +75,8 @@ export class ImportStepDialogUiComponent implements OnInit {
   }
 
   onNext() {
-    this.nextClicked.emit(this.selectedStep);
+    const importedStep = {step: this.selectedStep, stepName: this.selectedStep.name, flowName: this.selectedFlow.name}
+    this.nextClicked.emit(importedStep);
   }
 
 }
