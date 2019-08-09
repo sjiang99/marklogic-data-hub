@@ -3,7 +3,7 @@ import {Flow} from "../../models/flow.model";
 import {ManageFlowsService} from "../../services/manage-flows.service";
 import { FormGroup, FormControl } from '@angular/forms';
 import { Step } from '../../models/step.model';
-import _ = require('lodash');
+import * as _ from "lodash";
 
 @Component({
   selector: 'app-import-step-dialog-ui',

@@ -135,7 +135,7 @@ export class NewStepDialogUiComponent implements OnInit {
       const type = this.newStepForm.getRawValue().stepDefinitionType;
       this.setType(type);
       this.newStepForm.controls['stepDefinitionType'].disable();
-      if(!this.isImport && !this.isCopy){
+      if(!this.isCopy && !this.isImport){
         this.newStepForm.controls['name'].disable();
       }
     }
